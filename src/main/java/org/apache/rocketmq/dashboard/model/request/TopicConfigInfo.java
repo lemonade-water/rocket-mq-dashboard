@@ -26,6 +26,8 @@ public class TopicConfigInfo {
 
     /** topicConfig */
     private String topicName;
+    /**message.type**/
+    private String messageType;
     private int writeQueueNums;
     private int readQueueNums;
     private int perm;
@@ -40,9 +42,6 @@ public class TopicConfigInfo {
     }
 
     /** topicConfig */
-
-
-
     public List<String> getBrokerNameList() {
         return brokerNameList;
     }
@@ -57,6 +56,14 @@ public class TopicConfigInfo {
 
     public void setTopicName(String topicName) {
         this.topicName = topicName;
+    }
+
+    public String getMessageType() {
+        return messageType;
+    }
+
+    public void setMessageType(String messageType) {
+        this.messageType = messageType;
     }
 
     public int getWriteQueueNums() {

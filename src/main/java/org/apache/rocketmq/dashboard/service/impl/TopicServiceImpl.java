@@ -29,7 +29,10 @@ import org.apache.rocketmq.client.producer.SendResult;
 import org.apache.rocketmq.client.trace.TraceContext;
 import org.apache.rocketmq.client.trace.TraceDispatcher;
 import org.apache.rocketmq.common.MixAll;
+import org.apache.rocketmq.common.TopicAttributes;
 import org.apache.rocketmq.common.TopicConfig;
+import org.apache.rocketmq.common.attribute.AttributeParser;
+import org.apache.rocketmq.common.attribute.TopicMessageType;
 import org.apache.rocketmq.remoting.protocol.admin.TopicStatsTable;
 import org.apache.rocketmq.common.message.Message;
 import org.apache.rocketmq.remoting.protocol.body.ClusterInfo;
@@ -123,6 +126,7 @@ public class TopicServiceImpl extends AbstractCommonService implements TopicServ
     public void createOrUpdate(TopicConfigInfo topicCreateOrUpdateRequest) {
         TopicConfig topicConfig = new TopicConfig();
         BeanUtils.copyProperties(topicCreateOrUpdateRequest, topicConfig);
+        setMessageType(topicCreateOrUpdateRequest, topicConfig);
         try {
             ClusterInfo clusterInfo = mqAdminExt.examineBrokerClusterInfo();
             for (String brokerName : changeToBrokerNameSet(clusterInfo.getClusterAddrTable(),
@@ -133,6 +137,27 @@ public class TopicServiceImpl extends AbstractCommonService implements TopicServ
             Throwables.throwIfUnchecked(err);
             throw new RuntimeException(err);
         }
+    }
+
+    /**
+     * 设置message.type
+     * @param topicCreateOrUpdateRequest
+     * @param topicConfig
+     */
+    private void setMessageType(TopicConfigInfo topicCreateOrUpdateRequest, TopicConfig topicConfig) {
+        String messageType = topicCreateOrUpdateRequest.getMessageType();
+        String attrKey = AttributeParser.ATTR_ADD_PLUS_SIGN + TopicAttributes.TOPIC_MESSAGE_TYPE_ATTRIBUTE.getName();
+        if (StringUtils.isEmpty(messageType)){
+            topicConfig.getAttributes().put(attrKey,
+                    TopicAttributes.TOPIC_MESSAGE_TYPE_ATTRIBUTE.getDefaultValue());
+            return;
+        }
+
+        Set<String> topicMessageTypeSet = TopicMessageType.topicMessageTypeSet();
+        if (!topicMessageTypeSet.contains(messageType)){
+            throw new RuntimeException("消息类型不合法");
+        }
+        topicConfig.getAttributes().put(attrKey, messageType);
     }
 
     @Override
@@ -154,7 +179,10 @@ public class TopicServiceImpl extends AbstractCommonService implements TopicServ
         for (BrokerData brokerData : topicRouteData.getBrokerDatas()) {
             TopicConfigInfo topicConfigInfo = new TopicConfigInfo();
             TopicConfig topicConfig = examineTopicConfig(topic, brokerData.getBrokerName());
+            String messageType = topicConfig.getAttributes().getOrDefault(TopicAttributes.TOPIC_MESSAGE_TYPE_ATTRIBUTE.getName()
+                    , TopicAttributes.TOPIC_MESSAGE_TYPE_ATTRIBUTE.getDefaultValue());
             BeanUtils.copyProperties(topicConfig, topicConfigInfo);
+            topicConfigInfo.setMessageType(messageType);
             topicConfigInfo.setBrokerNameList(Lists.newArrayList(brokerData.getBrokerName()));
             topicConfigInfoList.add(topicConfigInfo);
         }

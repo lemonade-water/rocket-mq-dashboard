@@ -68,7 +68,6 @@ public class TopicController {
         return topicService.route(topic);
     }
 
-
     @RequestMapping(value = "/createOrUpdate.do", method = { RequestMethod.POST})
     @ResponseBody
     public Object topicCreateOrUpdateRequest(@RequestBody TopicConfigInfo topicCreateOrUpdateRequest) {

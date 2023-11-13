@@ -189,6 +189,25 @@
                     <span class="text-danger" ng-show="addAppForm.topicName.$error.required">{{'TOPIC_NAME'|translate}}不能为空.</span>
                 </div>
             </div>
+            <!--消息类型-->
+            <div class="form-group">
+                <label class="control-label col-sm-2">{{'MESSAGE_TYPE'|translate}}:</label>
+                <div class="col-sm-10" style="margin: 16px 0 0 0;">
+                    <input type="radio" ng-model="item.messageType" value="NORMAL" ng-disabled="ngDialogData.bIsUpdate" required/>
+                    <span style="margin-right: 20px;">{{'MESSAGE_TYPE_NORMAL'|translate}}</span>
+
+                    <input type="radio" ng-model="item.messageType" value="DELAY" ng-disabled="ngDialogData.bIsUpdate" required/>
+                    <span style="margin-right: 20px;">{{'MESSAGE_TYPE_DELAY'|translate}}</span>
+
+                    <input type="radio" ng-model="item.messageType" value="FIFO" ng-disabled="ngDialogData.bIsUpdate" required/>
+                    <span style="margin-right: 20px;">{{'MESSAGE_TYPE_FIFO'|translate}}</span>
+
+                    <input type="radio" ng-model="item.messageType" value="TRANSACTION" ng-disabled="ngDialogData.bIsUpdate" required/>
+                    <span style="margin-right: 20px;">{{'MESSAGE_TYPE_TRANSACTION'|translate}}</span>
+
+                    <span class="text-danger" ng-show="addAppForm.messageType.$error.required">{{'MESSAGE_TYPE'|translate}}不能为空.</span>
+                </div>
+            </div>
             <div class="form-group">
                 <label class="control-label col-sm-2">{{'WRITE_QUEUE_NUMS'|translate}}:</label>
                 <div class="col-sm-10">
